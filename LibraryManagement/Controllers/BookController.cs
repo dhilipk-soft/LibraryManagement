@@ -1,9 +1,10 @@
-﻿using LibraryManagement.Data;
+﻿using AutoMapper;
+using LibraryManagement.Application.Interfaces;
+using LibraryManagement.Infrastructure;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
 using LibraryManagement.Model.Shows;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManagement.Controllers
 {
@@ -11,55 +12,31 @@ namespace LibraryManagement.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private readonly LibraryContext dbContext;
+        private readonly IBookService _bookService;
 
-        public BookController(LibraryContext dbContext)
+        public BookController(IBookService bookService)
         {
-            this.dbContext = dbContext;
+            this._bookService = bookService;
         }
 
         // GET: api/Book
         [HttpGet]
         public IActionResult GetAllBooks()
         {
-            var books = dbContext.Books
-                .Include(b => b.Category)
-                .Select(b => new ShowBookDto
-                {
-                    Title = b.Title,
-                    Author = b.Author,
-                    TotalCopies = b.TotalCopies,
-                    AvailableCopies = b.AvailableCopies,
-                    CategoryName = b.Category.CategoryName,
-                    PublishDate = b.PublishDate.ToString(),
-                    Id = b.CategoryId
-                })
-                .ToList();
 
-            return Ok(books);
+            //_bookService.GetAllBooks();
+
+            return Ok(_bookService.GetAllBooks());
         }
 
         // GET: api/Book/{id}
         [HttpGet("{id:guid}")]
         public IActionResult GetBookById(Guid id)
         {
-            var book = dbContext.Books
-                .Include(b => b.Category)
-                .Where(b => b.Id == id)
-                .Select(b => new ShowBookDto
-                {
-                    Title = b.Title,
-                    Author = b.Author,
-                    TotalCopies = b.TotalCopies,
-                    AvailableCopies = b.AvailableCopies,
-                    CategoryName = b.Category.CategoryName
-
-                })
-                .FirstOrDefault();
-
-            if (book == null)
+            var book = _bookService.GetBookById(id);
+            if(book == null)
             {
-                return NotFound();
+                return NotFound("Book not found.");
             }
 
             return Ok(book);
@@ -69,37 +46,31 @@ namespace LibraryManagement.Controllers
         [HttpPost]
         public IActionResult AddBook(AddBookDto dto)
         {
-            // Validate if Category exists
-            var category = dbContext.Categoryies.Find(dto.CategoryId);
-            if (category == null)
+            try
             {
-                return BadRequest("Invalid category.");
+                var addedBook = _bookService.AddBook(dto);
+                return CreatedAtAction(nameof(GetBookById), new { id = addedBook.Id }, addedBook);
             }
-            var existingBook = dbContext.Books
-            .FirstOrDefault(b => b.Title.ToLower() == dto.Title.ToLower());
-
-            if (existingBook != null)
+            catch (Exception ex)
             {
-                return Conflict("A book with the same title already exists.");
+                return BadRequest(new { message = ex.Message });
             }
+        }
 
-            var book = new Book
+        [HttpPut("{id:guid}")]
+
+        public IActionResult UpdateBook([FromBody] UpdateBookDto updateBook, Guid id)
+        {
+
+            try
             {
-                Id = Guid.NewGuid(),
-                Title = dto.Title,
-                Author = dto.Author,
-                TotalCopies = dto.TotalCopies,
-                AvailableCopies = dto.AvailableCopies,
-                CategoryId = dto.CategoryId,
-                PublishDate = DateTime.Now
-            };
-
-
-
-            dbContext.Books.Add(book);
-            dbContext.SaveChanges();
-
-            return Ok(book);
+                var updatedBook = _bookService.UpdateBook(updateBook, id);
+                return Ok(updatedBook);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
     }
 }

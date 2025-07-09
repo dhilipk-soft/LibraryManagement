@@ -1,4 +1,4 @@
-﻿using LibraryManagement.Data;
+﻿using LibraryManagement.Infrastructure;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +82,8 @@ namespace LibraryManagement.Controllers
 
             dbContext.Members.Remove(member);
             dbContext.SaveChanges();
-            return Ok("Member deleted successfully.");
+            return Ok(new { message = "Member deleted successfully." });
+    
         }
     }
 }

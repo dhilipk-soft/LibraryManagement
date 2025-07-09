@@ -7,19 +7,27 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Model\NewFolder1\**" />
-    <Content Remove="Model\NewFolder1\**" />
-    <EmbeddedResource Remove="Model\NewFolder1\**" />
-    <None Remove="Model\NewFolder1\**" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Dhilip\Dhilip\Dhilip\.NET\LibraryManagement\LibraryManagement\Model\Shows\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Dhilip\Dhilip\Dhilip\.NET\LibraryManagement\LibraryManagement\Model\Shows\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LibraryManagement.Application\LibraryManagement.Application.csproj" />
+    <ProjectReference Include="..\LibraryManagement.Infrastructure\LibraryManagement.Infrastructure.csproj" />
+    <ProjectReference Include="..\LibraryManagement.Shared\LibraryManagement.Shared.csproj" />
   </ItemGroup>
 
 </Project>

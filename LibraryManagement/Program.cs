@@ -1,4 +1,8 @@
-using LibraryManagement.Data;
+using LibraryManagement.Application.Interfaces;
+using LibraryManagement.Application.Mappings;
+using LibraryManagement.Application.Services;
+using LibraryManagement.Infrastructure;
+using LibraryManagement.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,16 +20,28 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+builder.Services.AddControllers()
+    ;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add AutoMapper
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.AddDbContext<LibraryContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        b => b.MigrationsAssembly("LibraryManagement.Infrastructure") // ?? THIS is important
+    )
+);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())    
 {
     app.UseSwagger();
     app.UseSwaggerUI();
