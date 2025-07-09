@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using LibraryManagement.Application.DTOs.Loan;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
 using LibraryManagement.Model.Shows;
@@ -14,6 +15,8 @@ namespace LibraryManagement.Application.Mappings
             CreateMap<UpdateBookDto, Book>();
             CreateMap<Book, UpdateBookDto>();
             //CreateMap<>
+            CreateMap<ShowLoanDto, Loan>().ReverseMap();
+            CreateMap<LoanDto, Loan>().ReverseMap();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using LibraryManagement.Application.DTOs.Loan;
 using LibraryManagement.Model;
+using LibraryManagement.Model.Entities;
 using LibraryManagement.Model.Shows;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,10 @@ namespace LibraryManagement.Application.Interfaces
 {
     public interface ILoanService
     {
-        List<ShowLoanDto> GetAllLoans();
-        LoanDto GetLoanById(Guid id);
-        string CreateLoan(AddLoanDto dto);
-        string ReturnLoan(Guid id);
-        string DeleteLoan(Guid id);
+        List<LoanDisplayDto> GetAllLoans();
+        ShowLoanDto GetLoanById(Guid id);
+        LoanDto CreateLoan(AddLoanDto dto);
+        ShowLoanDto ReturnLoan(Guid id);
+        ShowLoanDto DeleteLoan(Guid id);
     }
 }
