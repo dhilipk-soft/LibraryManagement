@@ -49,5 +49,12 @@ namespace LibraryManagement.Infrastructure.Repositories
 
             return book;
         }
+
+        public Book GetBookByTitleAndLibrary(string Title, Guid id)
+        {
+            var book =_context.Books.FirstOrDefault(l => l.Title == Title && l.LibraryId == id);
+
+            return book;
+        }
     }
 }

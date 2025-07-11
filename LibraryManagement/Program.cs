@@ -25,6 +25,14 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<ILoanService, LoanServices>();
+// Add repositories
+builder.Services.AddScoped<ILibraryRepository, LibraryRepository>();
+builder.Services.AddScoped<IBookRepository, BookRepository>();
+
+// Add services
+builder.Services.AddScoped<ILibraryService, LibraryService>();
+builder.Services.AddScoped<IBookService, BookService>();
+
 
 
 builder.Services.AddControllers()

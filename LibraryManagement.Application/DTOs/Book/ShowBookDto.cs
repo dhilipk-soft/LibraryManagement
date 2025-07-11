@@ -7,7 +7,8 @@
         public string? Author { get; set; }      // Author name
         public int TotalCopies { get; set; }    // Total number of copies
         public int AvailableCopies { get; set; }    // ID of the category
-        public Guid CategoryId { get; set; } // Optional: Name of the category
+        public Guid CategoryId { get; set; }
+        public Guid LibraryId { get; set; }
         public string? PublishDate { get; set; }
     }
 

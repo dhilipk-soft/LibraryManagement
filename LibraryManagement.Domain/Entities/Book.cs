@@ -18,6 +18,11 @@ namespace LibraryManagement.Model.Entities
 
         public Guid CategoryId { get; set; }
 
+        [ForeignKey("Library")]
+        public Guid LibraryId { get; set; }
+
+        public Library Library { get; set; }
+
         public ICollection<Loan> Loans { get; set; } = new List<Loan>();
  
     }

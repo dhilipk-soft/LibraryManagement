@@ -62,6 +62,8 @@ namespace LibraryManagement.Controllers
         public IActionResult UpdateBook([FromBody] UpdateBookDto updateBook, Guid id)
         {
 
+            //console
+
             try
             {
                 var updatedBook = _bookService.UpdateBook(updateBook, id);

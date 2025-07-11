@@ -56,7 +56,7 @@ namespace LibraryManagement.Infrastructure.Repositories
                         DueTime = l.DueTime,
                         ReturnDate = l.ReturnDate
                     })
-                    .ToListAsync(); // Convert the whole query to a list
+                    .ToListAsync(); 
                     }
 
 

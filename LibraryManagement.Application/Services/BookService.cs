@@ -17,15 +17,18 @@ namespace LibraryManagement.Application.Services
         private readonly IBookRepository _bookRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
+        private readonly ILibraryRepository _libraryRepository;
 
         public BookService(
             IBookRepository bookRepository,
             ICategoryRepository categoryRepository,
-            IMapper mapper
+            IMapper mapper,
+            ILibraryRepository libraryRepository
             ) {
             this._mapper = mapper;
             this._bookRepository= bookRepository;
             this._categoryRepository = categoryRepository;
+            this._libraryRepository = libraryRepository;
         }
 
         ShowBookDto IBookService.AddBook(AddBookDto dto)
@@ -35,9 +38,20 @@ namespace LibraryManagement.Application.Services
             {
                 throw new ArgumentException("Category not found");
             }
- 
+
+            var library = _libraryRepository.GetLibraryByIdAsync(dto.LibraryId);
+            if (library == null)
+                throw new ArgumentException("Library not found");
+
+            // Optional: prevent duplicate titles in the same library
+            var existingBook = _bookRepository
+                .GetBookByTitleAndLibrary(dto.Title, dto.LibraryId);
+            if (existingBook != null)
+                throw new InvalidOperationException("A book with the same title already exists in this library.");
+
 
             var newBook = _mapper.Map<Book>(dto);
+            newBook.AvailableCopies = dto.TotalCopies;
             newBook.Id = Guid.NewGuid();
             newBook.PublishDate = DateTime.Now;
 
