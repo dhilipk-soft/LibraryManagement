@@ -14,6 +14,7 @@ namespace LibraryManagement.Application.Interfaces
     {
         List<LoanDisplayDto> GetAllLoans();
         ShowLoanDto GetLoanById(Guid id);
+        List<LoanDisplayDto> GetLoanByMemberId(Guid id);
         LoanDto CreateLoan(AddLoanDto dto);
         ShowLoanDto ReturnLoan(Guid id);
         ShowLoanDto DeleteLoan(Guid id);

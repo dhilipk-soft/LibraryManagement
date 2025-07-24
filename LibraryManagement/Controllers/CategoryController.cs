@@ -1,6 +1,7 @@
 ﻿using LibraryManagement.Infrastructure;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly LibraryContext dbContext;

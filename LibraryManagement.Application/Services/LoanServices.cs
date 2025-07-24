@@ -23,6 +23,7 @@ namespace LibraryManagement.Application.Services
             this._loanRepository = loanRepository;
             this._mapper = mapper;
         }
+
         LoanDto ILoanService.CreateLoan(AddLoanDto dto)
         {
             var loan = _loanRepository.AddLoanAsync(dto)
@@ -42,6 +43,12 @@ namespace LibraryManagement.Application.Services
         List<LoanDisplayDto> ILoanService.GetAllLoans()
         {
             return _loanRepository.GetAllLoansAsync().GetAwaiter().GetResult();
+        }
+
+        List<LoanDisplayDto> ILoanService.GetLoanByMemberId(Guid id)
+        {
+            var loan = _loanRepository.GetLoanByMember(id).GetAwaiter().GetResult();
+            return loan;
         }
 
         ShowLoanDto ILoanService.GetLoanById(Guid id)

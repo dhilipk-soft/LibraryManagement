@@ -1,12 +1,14 @@
 ﻿using LibraryManagement.Application.DTOs.Library;
 using LibraryManagement.Application.Interfaces;
 using LibraryManagement.Model;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class LibraryController : ControllerBase
     {
         private readonly ILibraryService _libraryService;

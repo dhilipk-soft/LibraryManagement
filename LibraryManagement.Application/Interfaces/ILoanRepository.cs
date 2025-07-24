@@ -13,6 +13,7 @@ namespace LibraryManagement.Application.Interfaces
     {
         Task<List<LoanDisplayDto>> GetAllLoansAsync();
         Task<ShowLoanDto?> GetLoanByIdAsync(Guid loanId);
+        Task<List<LoanDisplayDto>?> GetLoanByMember(Guid id);
         Task<Loan> AddLoanAsync(AddLoanDto loan);
         Task<Loan> DeleteLoanAsync(Guid id);
         Task SaveChangesAsync();

@@ -4,12 +4,14 @@ using LibraryManagement.Infrastructure;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
 using LibraryManagement.Model.Shows;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
@@ -20,21 +22,21 @@ namespace LibraryManagement.Controllers
         }
 
         // GET: api/Book
+        [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetAllBooks()
+        public async Task<IActionResult> GetAllBooks()
         {
-
-            //_bookService.GetAllBooks();
-
-            return Ok(_bookService.GetAllBooks());
+            var result = await _bookService.GetAllBooks(); // ← await here
+            return Ok(result); // ← returns actual data, not Task object
         }
+
 
         // GET: api/Book/{id}
         [HttpGet("{id:guid}")]
         public IActionResult GetBookById(Guid id)
         {
             var book = _bookService.GetBookById(id);
-            if(book == null)
+            if (book == null)
             {
                 return NotFound("Book not found.");
             }
@@ -42,14 +44,22 @@ namespace LibraryManagement.Controllers
             return Ok(book);
         }
 
+
         // POST: api/Book
         [HttpPost]
-        public IActionResult AddBook(AddBookDto dto)
+        public async Task<IActionResult> AddBook([FromBody] AddBookDto dto)
         {
             try
             {
-                var addedBook = _bookService.AddBook(dto);
-                return CreatedAtAction(nameof(GetBookById), new { id = addedBook.Id }, addedBook);
+                // Step 1: Create the book using your service
+                var addedBook = await _bookService.AddBook(dto);
+
+                // Step 2: Return a 201 Created response with the location of the new book
+                return CreatedAtAction(
+                    nameof(GetBookById),          // Name of the action that retrieves the book
+                    new { id = addedBook.Id },    // Route values (in this case, the book's ID)
+                    addedBook                     // The book data itself in the response body
+                );
             }
             catch (Exception ex)
             {
@@ -58,21 +68,21 @@ namespace LibraryManagement.Controllers
         }
 
         [HttpPut("{id:guid}")]
-
-        public IActionResult UpdateBook([FromBody] UpdateBookDto updateBook, Guid id)
+        public async Task<IActionResult> UpdateBook(Guid id, [FromBody] UpdateBookDto dto)
         {
-
-            //console
-
             try
             {
-                var updatedBook = _bookService.UpdateBook(updateBook, id);
+                var updatedBook = await _bookService.UpdateBook(dto, id);
+                if (updatedBook == null)
+                    return NotFound(new { message = "Book not found" });
+
                 return Ok(updatedBook);
             }
             catch (Exception ex)
             {
-                return NotFound(new { message = ex.Message });
+                return BadRequest(new { message = ex.Message });
             }
         }
+
     }
 }

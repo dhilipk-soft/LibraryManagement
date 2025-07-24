@@ -3,7 +3,9 @@ using LibraryManagement.Application.Interfaces;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Utilities;
 using System.Reflection.Metadata.Ecma335;
+using System.Web.Http;
 using System.Web.Http.Results;
 
 namespace LibraryManagement.Infrastructure.Repositories
@@ -67,7 +69,14 @@ namespace LibraryManagement.Infrastructure.Repositories
                 .Include(l => l.Member)
                 .FirstOrDefaultAsync(l => l.LoanId == loanId);
 
-            return find.LoanId != Guid.Empty ? new ShowLoanDto
+            if (find == null)
+                return null;
+
+            // Additional null checks (just to be safe)
+            if (find.Book == null || find.Member == null)
+                return null;
+
+            return new ShowLoanDto
             {
                 BookId = find.Book.Id,
                 Title = find.Book.Title,
@@ -76,21 +85,50 @@ namespace LibraryManagement.Infrastructure.Repositories
                 TotalCopies = find.Book.TotalCopies,
                 AvailableCopies = find.Book.AvailableCopies,
                 Members = new List<LoanMemberDto>
-                {
-                    new LoanMemberDto
-                    {
-                        LoanId = find.LoanId,
-                        MemberId = find.Member.MemberId,
-                        FullName = find.Member.FullName,
-                        Email = find.Member.Email,
-                        Phone = find.Member.Phone,
-                        IssueDate = find.IssueDate,
-                        DueTime = find.DueTime,
-                        ReturnDate = find.ReturnDate
-                    }
-                }
-            } : null;
+        {
+            new LoanMemberDto
+            {
+                LoanId = find.LoanId,
+                MemberId = find.Member.MemberId,
+                FullName = find.Member.FullName,
+                Email = find.Member.Email,
+                Phone = find.Member.Phone,
+                IssueDate = find.IssueDate,
+                DueTime = find.DueTime,
+                ReturnDate = find.ReturnDate
+            }
         }
+            };
+        }
+
+        public async Task<List<LoanDisplayDto>?> GetLoanByMember(Guid id)
+        {
+            var find = await _context.Loans
+                .Include(l => l.Book)
+                .Include(l => l.Member).Where(l => l.MemberId == id)
+                .ToListAsync();
+
+            if (find == null || find.Count == 0)
+                return null;
+
+            var loanDtos = find.Select(l => new LoanDisplayDto
+            {
+                LoanId = l.LoanId,
+                BookId = l.Book.Id,
+                Title = l.Book.Title,
+                Author = l.Book.Author,
+                MemberId = l.Member.MemberId,
+                FullName = l.Member.FullName,
+                Email = l.Member.Email,
+                Phone = l.Member.Phone,
+                IssueDate = l.IssueDate,
+                DueTime = l.DueTime,
+                ReturnDate = l.ReturnDate
+            }).ToList();
+
+            return loanDtos;
+        }
+
 
         public async Task<Loan> AddLoanAsync(AddLoanDto dto)
         {
@@ -103,9 +141,7 @@ namespace LibraryManagement.Infrastructure.Repositories
 
             if (book.AvailableCopies <= 0)
                 throw new InvalidOperationException("No available copies of the book.");
-            var activeLoan = await GetActiveLoanAsync(dto.BookId, dto.MemberId);
-            if (activeLoan != null && activeLoan.ReturnDate == null)
-                throw new InvalidOperationException("This book is already loaned out and not returned yet.");
+            
             var loan = new Loan
             {
                 LoanId = Guid.NewGuid(),
@@ -117,11 +153,11 @@ namespace LibraryManagement.Infrastructure.Repositories
                 ReturnDate = null
             };
 
-            await _context.Loans.AddAsync(loan);
-
+            _context.Loans.Add(loan);
+            _context.SaveChanges();
             book.AvailableCopies--;
             _context.Books.Update(book);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             return loan;
         }
 
@@ -138,10 +174,10 @@ namespace LibraryManagement.Infrastructure.Repositories
                 throw new KeyNotFoundException("Book not found.");
 
             _context.Loans.Remove(loan);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
             book.AvailableCopies++;
             _context.Books.Update(book);
-            await _context.SaveChangesAsync();
+            _context.SaveChanges();
 
             return loan;
         }

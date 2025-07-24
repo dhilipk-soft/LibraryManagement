@@ -12,7 +12,7 @@ namespace LibraryManagement.Infrastructure
 
         public LibraryContext(DbContextOptions<LibraryContext> options) : base(options) { }
 
-        public DbSet<Book> Books { get; set; } = null!;
+        public DbSet<Book> Books { get; set; } =    null!;
         public DbSet<Category> Categoryies { get; set; } = null!;
 
         public DbSet<Librarian> Librarians { get; set; } = null!;

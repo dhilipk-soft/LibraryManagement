@@ -4,11 +4,10 @@ namespace LibraryManagement.Application.Interfaces
 {
     public interface IBookRepository
     {
-        public List<Book> GetAllBooks();
-        public Book? GetBookById(Guid id);
-        public Book AddBook(Book book);
-        public Book UpdateBook(Book book);
-
-        public Book GetBookByTitleAndLibrary(string Title, Guid id);
+        Task<List<Book>> GetAllBooks();
+        Task<Book?> GetBookById(Guid id);
+        Task<Book> AddBook(Book book);
+        Task<Book> UpdateBook(Book book);
+        Task<Book?> GetBookByTitleAndLibrary(string title, Guid libraryId);
     }
 }

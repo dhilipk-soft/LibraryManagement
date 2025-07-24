@@ -4,6 +4,7 @@ using LibraryManagement.Infrastructure;
 using LibraryManagement.Model;
 using LibraryManagement.Model.Entities;
 using LibraryManagement.Model.Shows;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ namespace LibraryManagement.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class LoanController : ControllerBase
     {
         private readonly LibraryContext dbContext;
@@ -20,6 +22,25 @@ namespace LibraryManagement.Controllers
         {
             this.dbContext = dbContext;
             this.loanService = loanService;
+        }
+
+        // GET : loan by phone number
+        [HttpGet("GetLoanByMemberId")]
+        public IActionResult GetLoanByMemberId(Guid id)
+        {
+            try
+            {
+                var loan = loanService.GetLoanByMemberId(id);
+                if (loan == null)
+                {
+                    return NotFound("Loan not found.");
+                }
+                return Ok(loan);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         // GET: api/Loan
